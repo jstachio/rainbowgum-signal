@@ -3,14 +3,46 @@
   <parent>
     <groupId>io.jstach.rainbowgum</groupId>
     <artifactId>rainbowgum-maven-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.13.0</version>
+    <relativePath />
   </parent>
   <artifactId>rainbowgum-signal</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
   <name>rainbowgum-signal</name>
+  <description>Unix signal based reopen of Rainbow Gum outputs for log rotation</description>
+  <url>https://github.com/jstachio/rainbowgum-signal</url>
+  <scm>
+    <connection>scm:git:https://github.com/jstachio/rainbowgum-signal.git</connection>
+    <developerConnection>scm:git:git@github.com:jstachio/rainbowgum-signal.git</developerConnection>
+    <url>https://github.com/jstachio/rainbowgum-signal/tree/main</url>
+    <tag>HEAD</tag>
+  </scm>
   <properties>
-    <doc.resources>../</doc.resources>
-    <parent.root>${basedir}/..</parent.root>
+    <!--
+      This project has its own version, so the parent's ${project.version} managed
+      Rainbow Gum dependencies (including transitive ones) would resolve to the
+      wrong version; dependencyManagement below pins them to this instead.
+    -->
+    <rainbowgum.version>0.13.0</rainbowgum.version>
+    <project.build.outputTimestamp>1790555261</project.build.outputTimestamp>
+    <doc.resources></doc.resources>
+    <doc.snippets>src/test/java</doc.snippets>
+    <parent.root>${basedir}</parent.root>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.jstach.rainbowgum</groupId>
+        <artifactId>rainbowgum-core</artifactId>
+        <version>${rainbowgum.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jstach.rainbowgum</groupId>
+        <artifactId>rainbowgum-annotation</artifactId>
+        <version>${rainbowgum.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -57,4 +89,92 @@
       </plugin>
     </plugins>
   </build>
+  <!--
+    The parent's analysis profiles put rainbowgum-apt:${project.version} on the
+    annotation processor path. Each list is redeclared in full here (Maven replaces
+    the list rather than merging it) with ${rainbowgum.version} instead, keeping the
+    parent's other processors and their version properties.
+  -->
+  <profiles>
+    <profile>
+      <id>checkerframework</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <annotationProcessorPaths combine.self="override">
+                <path>
+                  <groupId>io.jstach.rainbowgum</groupId>
+                  <artifactId>rainbowgum-apt</artifactId>
+                  <version>${rainbowgum.version}</version>
+                </path>
+                <path>
+                  <groupId>org.checkerframework</groupId>
+                  <artifactId>checker</artifactId>
+                  <version>${checkerframework.version}</version>
+                </path>
+              </annotationProcessorPaths>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>errorprone</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <annotationProcessorPaths combine.self="override">
+                <path>
+                  <groupId>io.jstach.rainbowgum</groupId>
+                  <artifactId>rainbowgum-apt</artifactId>
+                  <version>${rainbowgum.version}</version>
+                </path>
+                <path>
+                  <groupId>com.google.errorprone</groupId>
+                  <artifactId>error_prone_core</artifactId>
+                  <version>${error-prone.version}</version>
+                </path>
+              </annotationProcessorPaths>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>nullaway</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <annotationProcessorPaths combine.self="override">
+                <path>
+                  <groupId>io.jstach.rainbowgum</groupId>
+                  <artifactId>rainbowgum-apt</artifactId>
+                  <version>${rainbowgum.version}</version>
+                </path>
+                <path>
+                  <groupId>com.google.errorprone</groupId>
+                  <artifactId>error_prone_core</artifactId>
+                  <version>${error-prone.version}</version>
+                </path>
+                <path>
+                  <groupId>com.uber.nullaway</groupId>
+                  <artifactId>nullaway</artifactId>
+                  <version>${nullaway.version}</version>
+                </path>
+              </annotationProcessorPaths>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

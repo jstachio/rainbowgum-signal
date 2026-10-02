@@ -124,6 +124,7 @@ public final class SignalConfigurator implements Configurator, AutoCloseable {
 		return true;
 	}
 
+	@SuppressWarnings("ReferenceEquality") // SIG_DFL/SIG_IGN are sentinel instances
 	private void install(LogConfig config, String name) {
 		var outputRegistry = config.outputRegistry();
 		var alerts = config.alerts();
