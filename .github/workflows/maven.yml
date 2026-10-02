@@ -1,0 +1,34 @@
+name: Build with Maven
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress"
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 27
+        uses: actions/setup-java@v5
+        with:
+          java-version: '27'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build and Test with Maven
+        run: ./mvnw $MAVEN_CLI_OPTS clean verify
+      - name: Analyze (checkerframework, errorprone, nullaway)
+        run: bin/analyze.sh
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: '**/target/surefire-reports/TEST-*.xml'
