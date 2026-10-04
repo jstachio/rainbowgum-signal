@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,6 +64,7 @@ class SignalConfiguratorTest {
 			Signal.raise(new Signal(SignalConfigurator.DEFAULT_SIGNAL_NAME));
 			assertTrue(latch.await(5, TimeUnit.SECONDS), "signal handler should have run within 5s");
 			assertEquals(1, reopenCount.get());
+			assertEquals(List.of("INFO Received signal SIGUSR1. Reopening outputs."), signalAlerts(config));
 		}
 	}
 
@@ -117,6 +119,15 @@ class SignalConfiguratorTest {
 		assertEquals(SignalHandler.SIG_DFL, restored);
 		Signal.handle(sig, SignalHandler.SIG_DFL); // avoid leaking `probe` across tests
 													// in this JVM
+	}
+
+	private static List<String> signalAlerts(LogConfig config) {
+		return config.alerts()
+			.dump()
+			.stream()
+			.filter(e -> e.loggerName().equals(SignalConfigurator.class.getName()))
+			.map(e -> e.level() + " " + e.message())
+			.toList();
 	}
 
 	private static ListLogOutput countingOutput(CountDownLatch latch, AtomicInteger reopenCount) {

@@ -27,6 +27,8 @@ import sun.misc.SignalHandler;
  * explicitly in code - constructing and configuring this class directly is itself the
  * opt-in.
  * <p>
+ * Each received signal is recorded as an info alert in {@link LogConfig#alerts()}.
+ * <p>
  * Any previously installed handler for the same signal is chained (called after this
  * handler runs), not discarded, so this composes with other signal handlers in the same
  * process; {@link #close()} restores it.
@@ -129,6 +131,12 @@ public final class SignalConfigurator implements Configurator, AutoCloseable {
 		var outputRegistry = config.outputRegistry();
 		var alerts = config.alerts();
 		SignalHandler handler = raisedSignal -> {
+			/*
+			 * Recorded before reopening so the alert is visible to whatever the reopen
+			 * itself triggers, and is still recorded if the reopen fails.
+			 */
+			alerts.info(SignalConfigurator.class,
+					"Received signal SIG" + raisedSignal.getName() + ". Reopening outputs.");
 			try {
 				outputRegistry.reopen();
 			}
