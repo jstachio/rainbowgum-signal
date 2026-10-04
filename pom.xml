@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.jstach.rainbowgum</groupId>
     <artifactId>rainbowgum-maven-parent</artifactId>
-    <version>0.13.0</version>
+    <version>0.14.0</version>
     <relativePath />
   </parent>
   <artifactId>rainbowgum-signal</artifactId>
@@ -23,7 +23,7 @@
       Rainbow Gum dependencies (including transitive ones) would resolve to the
       wrong version; dependencyManagement below pins them to this instead.
     -->
-    <rainbowgum.version>0.13.0</rainbowgum.version>
+    <rainbowgum.version>0.14.0</rainbowgum.version>
     <project.build.outputTimestamp>1790555261</project.build.outputTimestamp>
     <doc.resources></doc.resources>
     <doc.snippets>src/test/java</doc.snippets>
